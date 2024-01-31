@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/go-ozzo/ozzo-validation/is"
 )
 
 type IDatesRequest interface {
@@ -38,7 +37,7 @@ func NewDateProfileListRequestDto(
 func (dto *DateProfileListRequestDto) Validate() (err error) {
 	if err := validation.ValidateStruct(
 		dto,
-		validation.Field(&dto.Id, validation.Required, is.Int),
+		validation.Field(&dto.Id, validation.Required),
 	); err != nil {
 		retErr := fmt.Errorf("Invalid request dating profile list")
 		return retErr
@@ -80,8 +79,8 @@ func NewUpdateStatusDateProfileRequestDto(
 func (dto *UpdateStatusDateProfileRequestDto) Validate() (err error) {
 	if err := validation.ValidateStruct(
 		dto,
-		validation.Field(&dto.UserId, validation.Required, is.Int),
-		validation.Field(&dto.DatingId, validation.Required, is.Int),
+		validation.Field(&dto.UserId, validation.Required),
+		validation.Field(&dto.DatingId, validation.Required),
 		validation.Field(&dto.Status, validation.Required, validation.In("pass", "like")),
 	); err != nil {
 		retErr := fmt.Errorf("Invalid body request update status dating profile")

@@ -4,6 +4,7 @@ import (
 	"context"
 	"dating-services/src/infra/persistence/model"
 	"fmt"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -48,13 +49,17 @@ func (d *datesPersistence) GetDateList(ctx context.Context, req GetListDatingPro
 		assignDate = append(assignDate, int(d.DatingId))
 	}
 
+	where := fmt.Sprintf(`id <> %d`, req.UserId)
+	if len(assignDate) > 0 {
+		where += fmt.Sprintf(` AND id NOT IN (%v)`, strings.Trim(strings.Replace(fmt.Sprint(assignDate), " ", ",", -1), "[]"))
+	}
 	if req.IsPremium {
-		err = db.Find(&resp, "dating_id NOT IN (?)", assignDate).Error
+		err = db.Find(&resp, where).Error
 		if err != nil {
 			return resp, err
 		}
 	} else {
-		err = db.Limit(10).Find(&resp, "dating_id NOT IN (?)", assignDate).Error
+		err = db.Limit(10).Find(&resp, where).Error
 		if err != nil {
 			return resp, err
 		}

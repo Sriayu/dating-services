@@ -104,6 +104,11 @@ func (u *usersUsecase) PayUpgradeUser(ctx context.Context, do dto.IUsersRequest)
 		return resp, err
 	}
 
+	err = u.usersRepo.UpdateUserPremium(ctx, upgradeUser.UserId)
+	if err != nil {
+		return resp, err
+	}
+
 	return u.packageOrderRepo.CreatePackageOrder(ctx, postgres.CreatePackageOrderRequest{
 		CartId:     int(cartData.ID),
 		PaymentId:  upgradeUser.PaymentMethodId,

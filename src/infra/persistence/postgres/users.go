@@ -24,6 +24,7 @@ type IUsersRepository interface {
 	RegisterUsers(ctx context.Context, req UserRegisterRequest) (err error)
 	LoginUsers(ctx context.Context, req UserLoginRequest) (resp *model.Users, err error)
 	UserDetail(ctx context.Context, id int) (resp *model.Users, err error)
+	UpdateUserPremium(ctx context.Context, id int) (err error)
 }
 
 type usersPersistence struct {
@@ -83,4 +84,24 @@ func (u *usersPersistence) UserDetail(ctx context.Context, id int) (resp *model.
 	}
 
 	return resp, nil
+}
+
+func (u *usersPersistence) UpdateUserPremium(ctx context.Context, id int) (err error) {
+	trx := u.dBConn.WithContext(ctx).Begin()
+	defer func() {
+		if err != nil {
+			trx.Rollback()
+		}
+	}()
+	resp := model.Users{}
+	err = trx.Model(&resp).Where("id = ?", id).Update("is_premium", true).Error
+	if err != nil {
+		return err
+	}
+
+	err = trx.Commit().Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
